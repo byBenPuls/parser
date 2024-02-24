@@ -9,4 +9,4 @@ Console.WriteLine(MyKey);
 // --------------------------------------------
 // Rewrite file
 
-Cfg.NewValue(@path, "name", "GGWP Loosers");
+Cfg.NewValue(@path, "name", "NewValue");
