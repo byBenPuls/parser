@@ -55,7 +55,7 @@ namespace Parser
                 }
             }
             string AllData = File.ReadAllText(path);
-            string NewData = AllData.Replace(result, $"name \"{value}\"");
+            string NewData = AllData.Replace(result, value);
             File.WriteAllText(path, NewData);
             
         }
