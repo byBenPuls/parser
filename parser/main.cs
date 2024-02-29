@@ -1,12 +1,11 @@
-﻿using System.IO;
-using System;
+﻿using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Net.NetworkInformation;
 
-namespace Parser
+
+namespace GameData
 {
-
-
     class Cfg
     {
         public static string GetValue(string path, string key)
@@ -15,12 +14,12 @@ namespace Parser
             using (StreamReader reader = new StreamReader(path, Encoding.UTF8))
             {
                 Regex regex = new Regex("\\b" + key + "\\b", RegexOptions.IgnoreCase);
-                string str = null;
-                while ((str = reader.ReadLine()) != null)
+                string? strEmpty;
+                while ((strEmpty = reader.ReadLine()) != null)
                 {
-                    if (regex.IsMatch(str))
+                    if (regex.IsMatch(strEmpty))
                     {
-                        result = str;
+                        result = strEmpty;
                         break;
                     }
                 }
@@ -37,27 +36,54 @@ namespace Parser
 
         public static void NewValue(string path, string key, string value)
         {
-            int CountLine = 0;
+            int countLine = 0;
             string result = "";
             using (StreamReader reader = new StreamReader(path, Encoding.UTF8))
             {
                 Regex regex = new Regex("\\b" + key + "\\b", RegexOptions.IgnoreCase);
-                string str = null;
+                string? str = "";
                 while ((str = reader.ReadLine()) != null)
                 {
-                    CountLine++;
+                    countLine++;
                     if (regex.IsMatch(str))
                     {
                         result = str;
-                        //Console.WriteLine(CountLine);
                         break;
                     }
                 }
             }
-            string AllData = File.ReadAllText(path);
-            string NewData = AllData.Replace(result, $"name \"{value}\"");
-            File.WriteAllText(path, NewData);
+
+            try
+            {
+                string allData = File.ReadAllText(path);
+                string newData = allData.Replace(result, value);
+                File.WriteAllText(path, newData);
+            }
+            catch
+            {
+                return;
+            }
+
             
+        }
+    }
+
+    class ServerInfo
+    {
+        public static void GetInfo()
+        {
+            var ipProps = IPGlobalProperties.GetIPGlobalProperties();
+            var tcpConnections = ipProps.GetActiveTcpConnections();
+ 
+            Console.WriteLine($"Всего {tcpConnections.Length} активных TCP-подключений");
+            Console.WriteLine();
+            foreach (var connection in tcpConnections)
+            {
+                Console.WriteLine("=============================================");
+                Console.WriteLine($"Локальный адрес: {connection.LocalEndPoint.Address}:{connection.LocalEndPoint.Port}");
+                Console.WriteLine($"Адрес удаленного хоста: {connection.RemoteEndPoint.Address}:{connection.RemoteEndPoint.Port}");
+                Console.WriteLine($"Состояние подключения: {connection.State}");
+        }
         }
     }
 }
